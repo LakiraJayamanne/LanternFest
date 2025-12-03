@@ -6,6 +6,9 @@ const AudioManager = (() => {
   let isMuffled = true;
   let introEnded = false;
   let currentIndex = 0;
+  let audioCtx = null;
+  let mediaSource = null;
+  let analyserNode = null;
 
   const shuffleArray = arr => {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -21,31 +24,49 @@ const AudioManager = (() => {
     'music/Carti/Stop Breathing.mp3',
     'music/Carti/Toxic.mp3',
     'music/Carti/wokeuplikethis.mp3',
+
     'music/Donny/Bandit.mp3',
-    'music/Donny/Donny Darko.mp3',
+    'music/Donny/Kryptonite.mp3',
     'music/Donny/New drop.mp3',
     'music/Donny/No pole.mp3',
     'music/Donny/Tiramisu.mp3',
+
     'music/Kanye/Burn.mp3',
     'music/Kanye/Everything i am.mp3',
-    'music/Kanye/Fuk sunn.mp3',
+    'music/Kanye/Fuk sumn.mp3',
     'music/Kanye/On sight.mp3',
     'music/Kanye/Touch the sky.mp3',
+
     'music/Ken/Fighting my demons.mp3',
     'music/Ken/Rock n RoLL.mp3',
     'music/Ken/Shoot.mp3',
     'music/Ken/Thx.mp3',
     'music/Ken/yes.mp3',
+
     'music/Lone/Blitz.mp3',
     'music/Lone/Catch a kill.mp3',
     'music/Lone/If looks could kill.mp3',
     'music/Lone/Leash.mp3',
     'music/Lone/n(n).mp3',
+
     'music/Travis/4X4.mp3',
     'music/Travis/Backyard.mp3',
     'music/Travis/Beep beep.mp3',
-    'music/Travis/Highest in the room.mp3',
-    'music/Travis/wokeuplikethis.mp3'
+    'music/Travis/Till further notice.mp3',
+    'music/Travis/I know.mp3',
+
+    'music/Uzi/Aye.mp3',
+    'music/Uzi/For fun.mp3',
+    'music/Uzi/Homecoming.mp3',
+    'music/Uzi/Space High.mp3',
+    'music/Uzi/x2.mp3',
+
+    'music/Yeat/1093.mp3',
+    'music/Yeat/Come n Go.mp3',
+    'music/Yeat/Money Twerk.mp3',
+    'music/Yeat/Nun Id Change.mp3',
+    'music/Yeat/Out the way.mp3',
+    'music/Yeat/System.mp3'
   ]);
 
   const init = () => {
@@ -61,11 +82,36 @@ const AudioManager = (() => {
     audio.loop = true;
     audio.volume = 0.2;
 
+    // create AudioContext and analyser so external visualizers can use it
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audio && audioCtx && !mediaSource) {
+        try {
+          mediaSource = audioCtx.createMediaElementSource(audio);
+          analyserNode = audioCtx.createAnalyser();
+          analyserNode.fftSize = 1024;
+          analyserNode.smoothingTimeConstant = 0.8;
+          // connect source to analyser (don't connect analyser to destination to avoid duplicate output)
+          mediaSource.connect(analyserNode);
+        } catch (e) {
+          // creating MediaElementSource can fail in some contexts; swallow for now
+          console.warn('AudioManager: media source setup failed', e);
+        }
+      }
+    } catch (e) {}
+
     isInitialized = true;
   };
 
   const play = () => {
     if (!audio) return;
+    try {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    } catch (e) {}
     audio.play().catch(err => console.error('Playback failed:', err));
   };
 
@@ -119,6 +165,10 @@ const AudioManager = (() => {
   const isPlaying = () => { try { return !!(audio && !audio.paused); } catch(e){ return false } };
   const toggleMute = () => { if (audio) audio.muted = !audio.muted; };
   const isMuted = () => { try { return !!(audio && audio.muted); } catch(e){ return false } };
+  const getAudioElement = () => audio;
+  const getAnalyser = () => analyserNode;
+  const getAudioContext = () => audioCtx;
+  const resumeContext = async () => { try { if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume(); } catch(e){} };
 
   return {
     init,
@@ -133,6 +183,10 @@ const AudioManager = (() => {
     , isPlaying
     , toggleMute
     , isMuted
+    , getAudioElement
+    , getAnalyser
+    , getAudioContext
+    , resumeContext
   };
 })();
 

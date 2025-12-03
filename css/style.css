@@ -9,6 +9,10 @@ body, html {
   font-family: sans-serif;
 }
 
+:root {
+  --visualizer-color: #4bd08e; /* accent colour; change to match site */
+}
+
 .spotlight-overlay {
   position: fixed;
   inset: 0;
@@ -110,7 +114,6 @@ body, html {
 
 /* Additional styles for main content */
 
-/* Music player bar */
 .player-bar {
   display:flex;
   align-items:center;
@@ -181,3 +184,33 @@ body, html {
 .themeida-player img { width: 140px; height: 140px; border-radius: 18px; display:block; margin: 0 auto 12px }
 .themeida-title { font-weight:700; font-size:1.4rem }
 .themeida-sub { font-size:0.9rem; opacity:0.9 }
+
+/* Visualizer canvas placed behind content but above background */
+.visualizer-canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* place behind main content */
+  pointer-events: none;
+}
+
+/* Floating player UI (home page) */
+.player-ui {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 400;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+.player-ui .ctrl { background:transparent; border:1px solid rgba(255,255,255,0.12); color:#fff; padding:6px 8px; border-radius:6px; cursor:pointer }
+.player-ui #playerTrack { max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+

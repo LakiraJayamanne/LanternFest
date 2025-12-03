@@ -30,18 +30,12 @@
       const toggle = document.getElementById('toggle');
       const trackName = document.getElementById('trackName');
       ui.style.display = 'flex';
-      toggle.addEventListener('click', async () => {
+      toggle.addEventListener('click', () => {
         try {
           if (!window.AudioManager) return;
           AudioManager.init();
-          if (AudioManager.isPlaying && AudioManager.isPlaying()) {
-            AudioManager.pause();
-            toggle.textContent = 'Play';
-          } else {
-            await AudioManager.play().catch(() => {});
-            toggle.textContent = 'Pause';
-          }
-          try { trackName.textContent = AudioManager.getCurrentTitle ? AudioManager.getCurrentTitle() : 'Track'; } catch(e){}
+          AudioManager.play();
+          try { trackName.textContent = AudioManager.getCurrentTitle() || 'Track'; } catch(e){}
         } catch (e) { console.warn(e); }
       });
     });
