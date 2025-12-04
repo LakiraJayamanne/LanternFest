@@ -8,6 +8,24 @@ const AudioManager = (() => {
   let currentIndex = 0;
   let audioCtx = null;
   let mediaSource = null;
+  let filterNode = null;
+  let gainNode = null;
+  let baseGain = 0.8;
+  let proximityFactor = 1;
+
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+  const updateGain = () => {
+    if (gainNode) {
+      gainNode.gain.value = clamp(baseGain * proximityFactor, 0, 1.2);
+    }
+  };
+
+  const setFilterFreq = (freq) => {
+    if (filterNode && typeof freq === 'number') {
+      filterNode.frequency.value = clamp(freq, 50, 20000);
+    }
+  };
 
   const shuffleArray = arr => {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -18,7 +36,7 @@ const AudioManager = (() => {
   };
 
   const songPaths = shuffleArray([
-    'music/Carti/beef.mp3',
+    'music/Carti/Beef.mp3',
     'music/Carti/RIP Fredo.mp3',
     'music/Carti/Stop Breathing.mp3',
     'music/Carti/Toxic.mp3',
@@ -37,7 +55,7 @@ const AudioManager = (() => {
     'music/Kanye/Touch the sky.mp3',
 
     'music/Ken/Fighting my demons.mp3',
-    'music/Ken/Rock n RoLL.mp3',
+    'music/Ken/Rock n Roll.mp3',
     'music/Ken/Shoot.mp3',
     'music/Ken/Thx.mp3',
     'music/Ken/yes.mp3',
@@ -79,7 +97,7 @@ const AudioManager = (() => {
     const source = songPaths[currentIndex];
     audio = new Audio(source);
     audio.loop = true;
-    audio.volume = 0.2;
+    audio.volume = 1; // control loudness via gainNode/baseGain instead
 
     // attempt to create an AudioContext for playback resume handling
     try {
@@ -89,6 +107,14 @@ const AudioManager = (() => {
       if (audio && audioCtx && !mediaSource) {
         try {
           mediaSource = audioCtx.createMediaElementSource(audio);
+          filterNode = audioCtx.createBiquadFilter();
+          filterNode.type = 'lowpass';
+          filterNode.frequency.value = 18000;
+          gainNode = audioCtx.createGain();
+          updateGain();
+          mediaSource.connect(filterNode);
+          filterNode.connect(gainNode);
+          gainNode.connect(audioCtx.destination); // ensure audio is routed to output
           // Note: analyser/visualizer support removed — keep mediaSource so context can resume
           // but do not create or expose an analyser node.
         } catch (e) {
@@ -110,15 +136,44 @@ const AudioManager = (() => {
     audio.play().catch(err => console.error('Playback failed:', err));
   };
 
-  const unmute = () => {
+  const unmute = (fadeMs = 0) => {
     if (!audio) return;
-    audio.volume = 0.6;
+    const currentGain = gainNode ? gainNode.gain.value : baseGain * proximityFactor;
+    baseGain = 1.0;
+    proximityFactor = 1;
+    setFilterFreq(18000);
     isMuffled = false;
+    if (fadeMs > 0 && gainNode && audioCtx) {
+      const now = audioCtx.currentTime;
+      try {
+        gainNode.gain.cancelScheduledValues(now);
+        gainNode.gain.setValueAtTime(clamp(currentGain, 0, 1.2), now);
+        gainNode.gain.linearRampToValueAtTime(clamp(baseGain, 0, 1.2), now + fadeMs / 1000);
+      } catch (e) {
+        rampTo(baseGain, fadeMs);
+      }
+    } else {
+      updateGain();
+    }
+  };
+
+  const rampTo = (target, durationMs = 600) => {
+    if (!gainNode || !audioCtx) return;
+    const now = audioCtx.currentTime;
+    try {
+      gainNode.gain.cancelScheduledValues(now);
+      gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+      gainNode.gain.linearRampToValueAtTime(clamp(target, 0, 1.2), now + durationMs / 1000);
+    } catch (e) {
+      gainNode.gain.value = clamp(target, 0, 1.2);
+    }
   };
 
   const muffle = () => {
     if (!audio) return;
-    audio.volume = 0.2;
+    baseGain = 0.3; // louder while muffled
+    setFilterFreq(1200); // keep some highs so it's audible
+    updateGain();
     isMuffled = true;
   };
 
@@ -133,11 +188,12 @@ const AudioManager = (() => {
     if (!audio) {
       audio = new Audio(src);
       audio.loop = true;
-      audio.volume = isMuffled ? 0.2 : 0.6;
+      audio.volume = 1; // rely on gain node for loudness
       isInitialized = true;
     } else {
       const wasPlaying = !audio.paused;
       audio.src = src;
+      audio.volume = 1;
       if (wasPlaying) {
         audio.play().catch(() => {});
       }
@@ -162,6 +218,10 @@ const AudioManager = (() => {
   const isMuted = () => { try { return !!(audio && audio.muted); } catch(e){ return false } };
   const getAudioElement = () => audio;
   const resumeContext = async () => { try { if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume(); } catch(e){} };
+  const setProximityBoost = (factor) => {
+    proximityFactor = clamp(factor, 0.2, 1.2);
+    updateGain();
+  };
 
   return {
     init,
@@ -178,6 +238,8 @@ const AudioManager = (() => {
     , isMuted
     , getAudioElement
     , resumeContext
+    , rampTo
+    , setProximityBoost
   };
 })();
 

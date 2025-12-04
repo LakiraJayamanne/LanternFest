@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
     <button id="playerPlay" class="ctrl">▶</button>
     <button id="playerNext" class="ctrl">⏭</button>
     <button id="playerMute" class="ctrl">🔊</button>
-    <span id="playerTrack" style="margin-left:8px; font-weight:600"></span>
+    <span id="playerTrack" style="margin-left:8px; font-weight:600; display:none;"></span>
   `;
   document.body.appendChild(playerWrap);
 
@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
       if (play) play.textContent = AudioManager.isPlaying() ? '⏸' : '▶';
       if (mute) mute.textContent = AudioManager.isMuted() ? '🔇' : '🔊';
-      try { if (track && AudioManager.getCurrentTitle) track.textContent = AudioManager.getCurrentTitle(); } catch(e) { if (track) track.textContent = ''; }
+      try { if (track) track.textContent = ''; } catch(e) { if (track) track.textContent = ''; }
     } catch (e) {}
   }
 

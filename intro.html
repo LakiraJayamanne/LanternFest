@@ -10,61 +10,36 @@
 </head>
 <body>
   <!-- Themeida player (only visible thing until user starts music) -->
-  <div id="themeidaPlayer" class="themeida-player" role="button" tabindex="0" aria-label="Start music">
+  <div id="themeidaPlayer" class="themeida-player" aria-label="Start music">
     <div class="themeida-inner">
-      <img src="images/themeida.png" alt="Themeida" onerror="this.style.display='none'" />
-      <div class="themeida-title">MusicFest25</div>
-      <div class="themeida-sub">Tap to start music</div>
+        <div class="name-card">
+          <div class="name-chip">Welcome to MusicFest25</div>
+          <div class="name-title">Enter your name for MF25</div>
+          <p class="name-sub">Play the music for a better experience</p>
+          <div class="intro-mini-player">
+            <div class="mini-left">
+              <button id="miniPrev" class="mini-ctrl" aria-label="Previous track">⏮</button>
+              <button id="miniPlay" class="mini-ctrl" aria-label="Play or pause">▶</button>
+              <button id="miniNext" class="mini-ctrl" aria-label="Next track">⏭</button>
+              <button id="miniMute" class="mini-ctrl" aria-label="Mute or unmute">🔊</button>
+            </div>
+            <div class="mini-right">
+              <div id="miniTrack" class="mini-track">Loading track…</div>
+              <div id="miniStatus" class="mini-status">Muffled</div>
+            </div>
+          </div>
+          <div class="name-row">
+            <input id="firstNameInput" type="text" name="first" placeholder="First name" autocomplete="given-name" required />
+            <input id="lastNameInput" type="text" name="last" placeholder="Last name" autocomplete="family-name" required />
+          </div>
+          <button id="themeidaStartBtn" class="name-start">Click here to proceed *with music*</button>
+      </div>
     </div>
   </div>
 
   <!-- Controls removed on intro: player UI appears on the home page only -->
 
-  <div class="intro-content" id="introContent">
-    <button class="play-btn hidden" id="introEnterBtn">▶</button>
-  </div>
-
   <div class="spotlight-overlay"></div>
 
 </body>
-<script>
-  (function(){
-    const enter = document.getElementById('introEnterBtn');
-    const body = document.body;
-
-    // After a short delay, reveal the enter button area for accessibility
-    setTimeout(() => { body.classList.add('show-play-btn'); }, 300);
-
-    // Reveal the enter button and hide the starter when the themeida starter is clicked
-    const theme = document.getElementById('themeidaPlayer');
-    function revealControls() {
-      if (theme) theme.style.display = 'none';
-      if (enter) enter.classList.remove('hidden');
-    }
-
-    if (theme) {
-      theme.addEventListener('click', async (e) => {
-        try {
-          // initialize and play muffled via AudioManager (user gesture)
-          if (window.AudioManager) {
-            AudioManager.init();
-            try { AudioManager.muffle(); } catch(e){}
-            try { AudioManager.play(); } catch(e){}
-          }
-        } catch (err) { console.warn('Audio start failed', err); }
-        revealControls();
-      });
-    }
-
-    // Ensure the enter button triggers the existing intro handler (in js/intro.js)
-    if (enter) {
-      enter.addEventListener('click', (e) => {
-        const btn = document.querySelector('.play-btn');
-        if (btn) btn.click();
-      });
-    }
-  })();
-</script>
 </html>
-
-\\\

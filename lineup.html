@@ -8,8 +8,7 @@
   <title>MusicFest25 - Lineup</title>
   <link rel="stylesheet" href="css/style.css" />
   <script src="js/audioManager.js" defer></script>
-  <script src="js/spotlight.js" defer></script>
-  <script src="js/script.js" defer></script>
+  <script src="js/lineup.js" defer></script>
 </head>
 <body>
   <header>
@@ -22,19 +21,58 @@
         </div>
     </div>
   </header>
+
+  <div class="lineup-spotlight" aria-hidden="true"></div>
   
   <script src="js/player-ui.js" defer></script>
 
   <main>
     <h1>Artist Lineup</h1>
     <section class="artist-grid">
-      <!-- Add at least 6 artist blocks (img, name, genre, bio) -->
+
+      <!-- Day 1 -->
+
+      <div class="artist-card" data-artist="Travis">
+        <img src="images/Travis.jpeg" alt="Travis" />
+        <div class="overlay">Travis Scott</div>
+      </div>
+      <div class="artist-card" data-artist="Lone">
+        <img src="images/Lone.jpeg" alt="Lone" />
+        <div class="overlay">Destroy Lonely</div>
+      </div>
+      <div class="artist-card" data-artist="Ken">
+        <img src="images/Ken.jpeg" alt="Ken Carson" />
+        <div class="overlay">Ken Carson</div>
+      </div>
+      <div class="artist-card" data-artist="Carti">
+        <img src="images/Carti.jpeg" alt="Playboi Carti" />
+        <div class="overlay">Playboi Carti</div>
+      </div>  
+
+      <!-- Day 2 -->
+      
+      <div class="artist-card" data-artist="Ye">
+        <img src="images/Kanye.jpeg" alt="Ye" />
+        <div class="overlay">Ye</div>
+      </div>
+      <div class="artist-card" data-artist="Uzi">
+        <img src="images/Uzi.jpeg" alt="Lil Uzi Vert" />
+        <div class="overlay">Lil Uzi Vert</div>
+      </div>
+      <div class="artist-card" data-artist="Donny">
+        <img src="images/Donny.jpeg" alt="Don Toliver" />
+        <div class="overlay">Don Toliver</div>
+      </div>
+      <div class="artist-card" data-artist="Yeat">
+        <img src="images/Yeat.jpg" alt="Yeat" />
+        <div class="overlay">Yeat</div>
+      </div>
+      <!-- Repeat for each artist -->
     </section>
   </main>
 
   <footer>
     <p>© 2025 MusicFest25</p>
   </footer>
-  <div class="spotlight-overlay"></div>
 </body>
 </html>

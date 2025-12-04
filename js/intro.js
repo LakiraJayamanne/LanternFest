@@ -1,17 +1,117 @@
 window.addEventListener('DOMContentLoaded', () => {
-  const btn = document.querySelector('.play-btn');
+  const starter = document.getElementById('themeidaPlayer');
+  const spotlight = document.querySelector('.spotlight-overlay');
+  const firstInput = document.getElementById('firstNameInput');
+  const lastInput = document.getElementById('lastNameInput');
+  const startBtn = document.getElementById('themeidaStartBtn');
+  const miniPrev = document.getElementById('miniPrev');
+  const miniPlay = document.getElementById('miniPlay');
+  const miniNext = document.getElementById('miniNext');
+  const miniMute = document.getElementById('miniMute');
+  const miniStatus = document.getElementById('miniStatus');
+  let proximityEnabled = true;
 
-  btn.addEventListener('click', async (e) => {
+  // Always start fresh each load
+  try { localStorage.removeItem('mf25FirstName'); localStorage.removeItem('mf25LastName'); } catch(e){}
+
+  const startMuffled = async () => {
+    try {
+      if (!window.AudioManager) return;
+      AudioManager.init();
+      AudioManager.muffle();
+      await AudioManager.play();
+      await AudioManager.resumeContext?.();
+    } catch (e) {
+      console.warn('Intro audio start failed', e);
+    }
+  };
+
+  const expandSpotlight = (e) => {
+    return new Promise((resolve) => {
+      try {
+        if (!spotlight) return resolve();
+        const x = e?.clientX ?? window.innerWidth / 2;
+        const y = e?.clientY ?? window.innerHeight / 2;
+        spotlight.style.setProperty('--mouse-x', `${x}px`);
+        spotlight.style.setProperty('--mouse-y', `${y}px`);
+        spotlight.classList.add('spotlight-expand');
+        setTimeout(resolve, 600);
+      } catch (err) {
+        resolve();
+      }
+    });
+  };
+
+  const namesValid = () => {
+    const first = (firstInput?.value || '').trim();
+    const last = (lastInput?.value || '').trim();
+    if (!first) { firstInput?.focus(); return false; }
+    if (!last) { lastInput?.focus(); return false; }
+    return true;
+  };
+
+  const refreshMini = () => {
+    try {
+      if (!window.AudioManager) {
+        if (miniStatus) miniStatus.textContent = '';
+        if (miniPlay) miniPlay.textContent = '▶';
+        if (miniMute) miniMute.textContent = '🔊';
+        return;
+      }
+      if (miniPlay) miniPlay.textContent = AudioManager.isPlaying() ? '⏸' : '▶';
+      if (miniMute) miniMute.textContent = AudioManager.isMuted() ? '🔇' : '🔊';
+      if (miniStatus) miniStatus.textContent = AudioManager.isPlaying() ? (AudioManager.isMuted() ? 'Muted' : 'Playing') : 'Paused';
+    } catch (e) {}
+  };
+
+  const wireMiniControls = () => {
+    if (miniPrev) miniPrev.addEventListener('click', () => { try { AudioManager.init(); AudioManager.prev(); refreshMini(); } catch(e){} });
+    if (miniNext) miniNext.addEventListener('click', () => { try { AudioManager.init(); AudioManager.next(); refreshMini(); } catch(e){} });
+    if (miniMute) miniMute.addEventListener('click', () => { try { AudioManager.init(); AudioManager.toggleMute(); refreshMini(); } catch(e){} });
+    if (miniPlay) miniPlay.addEventListener('click', async () => {
+      try {
+        AudioManager.init();
+        if (AudioManager.isPlaying && AudioManager.isPlaying()) {
+          AudioManager.pause();
+        } else {
+          await startMuffled();
+        }
+        refreshMini();
+      } catch (e) {}
+    });
+    refreshMini();
+    setInterval(refreshMini, 800);
+  };
+  wireMiniControls();
+
+  // Dedicated start button inside the name card
+  if (startBtn) {
+    startBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!namesValid()) return;
+      await enterSite(e); // triggers start + transition + unmute
+    });
+  }
+
+  const enterSite = async (e) => {
     e.preventDefault();
 
-    // Do NOT initialize or start audio here. The music must be controlled only
-    // by the visible player UI. This click only transitions to the main content.
+    // Ensure music is playing (muffled) before transition
+    await startMuffled();
+
+    // Run spotlight expansion transition before loading the main page
+    await expandSpotlight(e);
 
     // Replace intro content with a persistent content iframe (shell) so audio keeps playing.
-    const introContent = document.querySelector('.intro-content');
-    if (introContent) introContent.style.display = 'none';
-    const spotlight = document.querySelector('.spotlight-overlay');
-    if (spotlight) spotlight.style.display = 'none';
+    if (spotlight) {
+      setTimeout(() => { spotlight.style.display = 'none'; }, 150);
+    }
+    const theme = document.getElementById('themeidaPlayer');
+    if (theme) {
+      theme.style.pointerEvents = 'none';
+      theme.style.opacity = '0';
+      setTimeout(() => { try { theme.remove(); } catch(e){} }, 350);
+    }
 
     const content = document.createElement('iframe');
     content.id = 'contentFrame';
@@ -32,7 +132,7 @@ window.addEventListener('DOMContentLoaded', () => {
           <button id="playerPlay" class="ctrl">▶</button>
           <button id="playerNext" class="ctrl">⏭</button>
           <button id="playerMute" class="ctrl">🔊</button>
-          <span id="playerTrack" style="margin-left:8px; font-weight:600"></span>
+          <span id="playerTrack" style="margin-left:8px; font-weight:600; display:none;"></span>
         `;
         document.body.appendChild(playerWrap);
 
@@ -52,7 +152,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             if (play) play.textContent = AudioManager.isPlaying() ? '⏸' : '▶';
             if (mute) mute.textContent = AudioManager.isMuted() ? '🔇' : '🔊';
-            try { if (track && AudioManager.getCurrentTitle) track.textContent = AudioManager.getCurrentTitle(); } catch(e) { if (track) track.textContent = ''; }
+            try { if (track) track.textContent = ''; } catch(e) { if (track) track.textContent = ''; }
           } catch (e) {}
         }
 
@@ -79,10 +179,30 @@ window.addEventListener('DOMContentLoaded', () => {
     } catch(e) { console.warn('Player injection failed', e); }
 
     // After the content is loaded/visible, clear the muffling so the main site plays normally.
-    setTimeout(() => {
-      try { if (window.AudioManager) AudioManager.unmute(); } catch (e) {}
-    }, 400);
-  });
+    const unmuteNow = () => { try { if (window.AudioManager) { AudioManager.unmute(4000); } } catch (e) {} };
+    content.addEventListener('load', unmuteNow);
+    setTimeout(unmuteNow, 600);
+
+    // Disable proximity once we leave intro
+    proximityEnabled = false;
+  };
+
+  // Proximity-based volume toward the proceed button
+  const updateProximity = (e) => {
+    try {
+      if (!proximityEnabled || !startBtn || !window.AudioManager) return;
+      const rect = startBtn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDist = 500;
+      const factor = Math.max(0.25, 1.8 - dist / maxDist); // closer => stronger lift
+      AudioManager.setProximityBoost?.(factor);
+    } catch (err) {}
+  };
+  window.addEventListener('pointermove', updateProximity);
 });
 
 document.addEventListener('mousemove', (e) => {
