@@ -1,6 +1,7 @@
 // Artist lineup interactions: overlay + hover preview using shared AudioManager
 
 const overlayEl = document.getElementById('artistOverlay');
+const overlayCard = overlayEl?.querySelector('.artist-overlay__card');
 const overlayClose = overlayEl?.querySelector('.artist-overlay__close');
 const overlayImg = document.getElementById('artistOverlayImg');
 const overlayName = document.getElementById('artistOverlayName');
@@ -260,7 +261,7 @@ try {
   setTimeout(() => { try { audio?.pause?.(); } catch (e) {} }, FADE_MS);
 } catch (e) {}
 
-// Automatically bring the main soundtrack back when leaving the lineup page
+// bring the main soundtrack back when leaving the lineup page
 const resumeGlobalMusic = () => {
   try {
     const audio = getAudio();
@@ -277,7 +278,7 @@ document.querySelectorAll('.pill-nav__link').forEach(link => {
   link.addEventListener('click', resumeGlobalMusic);
 });
 
-// Fallback: resume if the page is hidden or being unloaded
+// resume if the page is hidden or being unloaded
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') resumeGlobalMusic();
 });

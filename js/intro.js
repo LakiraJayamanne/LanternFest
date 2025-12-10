@@ -1,4 +1,5 @@
 window.addEventListener('DOMContentLoaded', () => {
+  const starter = document.getElementById('themeidaPlayer');
   const spotlight = document.querySelector('.spotlight-overlay');
   const firstInput = document.getElementById('firstNameInput');
   const lastInput = document.getElementById('lastNameInput');
@@ -105,7 +106,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   wireMiniControls();
 
-  // Dedicated start button inside the name card
+  // start button inside the name card
   if (startBtn) {
     startBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -123,14 +124,14 @@ window.addEventListener('DOMContentLoaded', () => {
   const enterSite = async (e) => {
     e.preventDefault();
 
-    // Make music muffled.
+    // Make music muffled
     await startMuffled();
     prepareIntroFade();
 
-    // Run spotlight expansion transition .
+    // Run spotlight expansion transition 
     await expandSpotlight(e);
 
-    // Replace intro content with a persistent content iframe (shell) so audio keeps playing.
+    // Remove intro elements
     if (spotlight) {
       setTimeout(() => { spotlight.style.display = 'none'; }, 150);
     }
@@ -147,8 +148,8 @@ window.addEventListener('DOMContentLoaded', () => {
     content.src = 'index.html';
     content.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:0;';
     document.body.appendChild(content);
-    // Inject a persistent floating player UI into the parent (this document)
-    // so controls are available while the content iframe is visible.
+
+    // Inject persistent player UI
     try {
       const existing = document.getElementById('persistentPlayer');
       if (!existing) {

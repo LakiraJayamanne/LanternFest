@@ -1,5 +1,4 @@
 window.addEventListener('DOMContentLoaded', () => {
-  // Avoid injecting UI inside an iframe — the persistent parent controls playback.
   if (window !== window.top) return;
 
   // If this is the intro page, do not render a visible player here.
@@ -64,4 +63,3 @@ window.addEventListener('DOMContentLoaded', () => {
   refresh();
   setInterval(refresh, 600);
 });
-
