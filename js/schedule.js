@@ -107,21 +107,22 @@
     timelineTracks.style.height = `${entries.length * 68}px`;
   };
 
-  // Render the text list below
+  // Render the text list below (table format for coursework requirement)
   const renderList = (entries) => {
     if (!listContainer) return;
-    listContainer.innerHTML = '';
-    entries.forEach((slot) => {
-      const row = document.createElement('div');
-      row.className = 'schedule-row';
+    const rows = entries.map((slot) => {
       const start = parseTime(slot.start);
       const end = parseTime(slot.end);
-      row.innerHTML = `
-        <div class="schedule-time">${formatRange(start, end)}</div>
-        <div class="schedule-artist">${slot.artist}</div>
-      `;
-      listContainer.appendChild(row);
-    });
+      return `<tr><td>${formatRange(start, end)}</td><td>${slot.artist}</td><td>Main Stage</td></tr>`;
+    }).join('');
+    listContainer.innerHTML = `
+      <table class="schedule-table">
+        <thead>
+          <tr><th>Time</th><th>Artist</th><th>Stage</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
   };
 
   // Swap data for selected day

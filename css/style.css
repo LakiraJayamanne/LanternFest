@@ -245,10 +245,18 @@ body.lineup-page h1 {
   font-weight: 600;
   justify-content: flex-start;
 }
-.actions {
+`.actions {
   display: flex;
   gap: 0.75rem;
 }
+.form-message {
+  margin: 0.25rem 0 0.5rem;
+  font-weight: 700;
+  min-height: 1.2em;
+}
+.form-message--error { color: #ff7b7b; }
+.form-message--success { color: #7bff9b; }
+
 .btn-primary, .btn-ghost {
   padding: 0.75rem 1.1rem;
   border-radius: 12px;
@@ -456,26 +464,20 @@ body.lineup-page h1 {
   backdrop-filter: blur(8px);
 }
 .schedule-table {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  width: 100%;
+  border-collapse: collapse;
 }
-.schedule-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
-  gap: 0.5rem;
+.schedule-table th,
+.schedule-table td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-.schedule-time {
-  font-weight: 700;
-  color: var(--theme-text);
-}
-.schedule-artist {
-  font-weight: 700;
-  text-align: right;
+.schedule-table th {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.9rem;
+  color: var(--theme-muted);
 }
 
 @media (max-width: 768px) {
@@ -1106,3 +1108,4 @@ body.lineup-page h1 {
   background: linear-gradient(135deg, rgba(76, 246, 140, 0.16), rgba(39, 201, 106, 0.12));
   border-color: rgba(76, 246, 140, 0.22);
 }
+

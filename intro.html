@@ -16,32 +16,27 @@
   <!-- Intro gate with name entry and starter controls -->
   <div id="themeidaPlayer" class="themeida-player" aria-label="Start music">
     <div class="themeida-inner">
-        <div class="name-card">
-          <div class="name-chip">Welcome to LanternFest</div>
-          <div class="name-title">Enter your name for LanternFest</div>
-          <p class="name-sub">Play the music for a better experience (you dont have a choice)</p>
-          <div class="intro-mini-player">
-            <div class="mini-left">
-              <button id="miniPrev" class="mini-ctrl" aria-label="Previous track">?</button>
-              <button id="miniPlay" class="mini-ctrl" aria-label="Play or pause">?</button>
-              <button id="miniNext" class="mini-ctrl" aria-label="Next track">?</button>
-              <button id="miniMute" class="mini-ctrl" aria-label="Mute or unmute">??</button>
-            </div>
+      <div class="name-card">
+        <div class="name-chip">Welcome to LanternFest</div>
+        <div class="name-title">Enter your name for LanternFest</div>
+        <p class="name-sub">Play the music for a better experience (you dont have a choice)</p>
+        <div class="intro-mini-player">
+          <div class="mini-left">
+            <button id="miniPrev" class="mini-ctrl" aria-label="Previous track">&#9194;</button>
+            <button id="miniPlay" class="mini-ctrl" aria-label="Play or pause">&#9654;</button>
+            <button id="miniNext" class="mini-ctrl" aria-label="Next track">&#9193;</button>
+            <button id="miniMute" class="mini-ctrl" aria-label="Mute or unmute">&#128266;</button>
           </div>
-          </div>
-          <div class="name-row">
-            <input id="firstNameInput" type="text" name="first" placeholder="First name" autocomplete="given-name" required />
-            <input id="lastNameInput" type="text" name="last" placeholder="Last name" autocomplete="family-name" required />
-          </div>
-          <button id="themeidaStartBtn" class="name-start">Click here to proceed *with music*</button>
+        </div>
+        <div class="name-row">
+          <input id="firstNameInput" type="text" name="first" placeholder="First name" autocomplete="given-name" required />
+          <input id="lastNameInput" type="text" name="last" placeholder="Last name" autocomplete="family-name" required />
+        </div>
+        <button id="themeidaStartBtn" class="name-start">Click here to proceed *with music*</button>
       </div>
     </div>
   </div>
 
-  <!-- Controls removed on intro: player UI appears on the home page only -->
-
   <div class="spotlight-overlay"></div>
-
 </body>
 </html>
-

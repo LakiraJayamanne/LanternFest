@@ -1,4 +1,4 @@
-window.addEventListener('DOMContentLoaded', () => {
+﻿window.addEventListener('DOMContentLoaded', () => {
   const starter = document.getElementById('themeidaPlayer');
   const spotlight = document.querySelector('.spotlight-overlay');
   const firstInput = document.getElementById('firstNameInput');
@@ -80,16 +80,16 @@ window.addEventListener('DOMContentLoaded', () => {
     return true;
   };
 
-  // Sync mini player labels
+      // Sync mini player labels
   const refreshMini = () => {
     try {
       if (!window.AudioManager) {
-        if (miniPlay) miniPlay.textContent = '▶';
-        if (miniMute) miniMute.textContent = '🔊';
+        if (miniPlay) miniPlay.textContent = '\u23F5';
+        if (miniMute) miniMute.textContent = '\uD83D\uDD0A';
         return;
       }
-      if (miniPlay) miniPlay.textContent = AudioManager.isPlaying() ? '⏸' : '▶';
-      if (miniMute) miniMute.textContent = AudioManager.isMuted() ? '🔇' : '🔊';
+      if (miniPlay) miniPlay.textContent = AudioManager.isPlaying() ? '\u23F8' : '\u23F5';
+      if (miniMute) miniMute.textContent = AudioManager.isMuted() ? '\uD83D\uDD07' : '\uD83D\uDD0A';
     } catch (e) {}
   };
 
@@ -165,11 +165,11 @@ window.addEventListener('DOMContentLoaded', () => {
         const playerWrap = document.createElement('div');
         playerWrap.id = 'persistentPlayer';
         playerWrap.className = 'player-ui';
-        playerWrap.innerHTML = `
-          <button id="playerPrev" class="ctrl">⏮</button>
-          <button id="playerPlay" class="ctrl">▶</button>
-          <button id="playerNext" class="ctrl">⏭</button>
-          <button id="playerMute" class="ctrl">🔊</button>
+                playerWrap.innerHTML = `
+          <button id="playerPrev" class="ctrl">&#9194;</button>
+          <button id="playerPlay" class="ctrl">&#9654;</button>
+          <button id="playerNext" class="ctrl">&#9193;</button>
+          <button id="playerMute" class="ctrl">&#128266;</button>
           <span id="playerTrack" style="margin-left:8px; font-weight:600; display:none;"></span>
         `;
         document.body.appendChild(playerWrap);
@@ -180,16 +180,16 @@ window.addEventListener('DOMContentLoaded', () => {
         const mute = document.getElementById('playerMute');
         const track = document.getElementById('playerTrack');
 
-        function refresh() {
+                function refresh() {
           try {
             if (!window.AudioManager) {
-              if (play) play.textContent = '▶';
-              if (mute) mute.textContent = '🔊';
+              if (play) play.textContent = '\u23F5';
+              if (mute) mute.textContent = '\uD83D\uDD0A';
               if (track) track.textContent = '';
               return;
             }
-            if (play) play.textContent = AudioManager.isPlaying() ? '⏸' : '▶';
-            if (mute) mute.textContent = AudioManager.isMuted() ? '🔇' : '🔊';
+            if (play) play.textContent = AudioManager.isPlaying() ? '\u23F8' : '\u23F5';
+            if (mute) mute.textContent = AudioManager.isMuted() ? '\uD83D\uDD07' : '\uD83D\uDD0A';
             try { if (track) track.textContent = ''; } catch(e) { if (track) track.textContent = ''; }
           } catch (e) {}
         }
@@ -251,3 +251,8 @@ document.addEventListener('mousemove', (e) => {
   document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
   document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
 });
+
+
+
+
+
